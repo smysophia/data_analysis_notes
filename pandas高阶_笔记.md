@@ -124,9 +124,9 @@ data.head()
                               Score
   Semester   	Subject	
   Semester 1	Mathematics  	54.666667
-              Science	        60.666667
+                Science	        60.666667
   Semester 2	Mathematics	    63.333333
-              Science	        79.000000
+                Science	        79.000000
   ```
 * 使用pivot方法
   `df.pivot_table(values='Score', index='Semester', columns='Subject', aggfunc=np.mean)`
