@@ -349,7 +349,7 @@ EXCEL
 * `fontsize`: x轴和y轴刻度的字体大小
 * `colormap`:str or matplotlib colormap object
   * 例如:Paired, Accent, tab10
-  * colormap参数官方文档: `https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html`
+  * [colormap参数官方文档](https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html)
 * `colorbar`: bool. only relevant for 'scatter' and hexbin' plots
 * `position`: float 柱状图柱子的位置.从0(左)到1(右),默认0.5(中间)
 * `table`:bool, Series or DataFrame 在x轴下画数据的表格
@@ -365,11 +365,11 @@ EXCEL
   * `linewidth` or lw: float 线的宽度
   * `marker`: 	[ '+' | ',' | '.' | '1' | '2' | '3' | '4' ] 记号
   * `markersize` or ms: float 记号大小
-  * 官方文档Line2D properties: `https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D`
+  * [官方文档Line2D properties](https://matplotlib.org/stable/api/_as_gen/matplotlib.lines.Line2D.html#matplotlib.lines.Line2D)
   * `width`: float 柱子宽度 默认0.8
   * `align`: {'center', 'edge'} 默认在中间 柱子和x轴的对齐方式
   * `edgecolor`: 柱子描边的颜色
-  * 官方文档 柱状图: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.bar.html#matplotlib.pyplot.bar
+  * [官方文档 柱状图](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.bar.html#matplotlib.pyplot.bar)
 
 ### python color
 <img src='https://github.com/smysophia/markdown_pictures/blob/main/python%20color.png' title='color'>
