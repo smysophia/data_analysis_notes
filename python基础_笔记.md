@@ -710,9 +710,9 @@ import sqlite3
   Tips：需要设置在conn.cursor()语句之前，若是不设置该语句，只能通过索引 0,1,2...来获取内容。
 
 * 获取游标  
-conn.cursor()  
+cursor = conn.cursor()  
   
-* 用于执行SQL语句  
+* 游标用于执行SQL语句  
 CRUD操作  
 cursor.execute("sql_str;")  
 cursor.executemany(sql_str) 批量操作  
@@ -723,6 +723,7 @@ cursor.executemany(sql_str) 批量操作
 获取前n条数据：fetchmany(n)  
   
 * 提交和关闭操作  
+关闭游标: cursor.close()
 提交操作：conn.commit()  
 关闭连接：conn.close()
 
@@ -735,13 +736,18 @@ table_data = cur.fetchall()
 print(table_data)
 ```
 
-* Create  
-    * CREATE TABLE  table_name(column1,column2,column3);  
-    `cur.execute('CREATE TABLE student(ID INT, NAME TEXT, AGE INT, SCORE FLOAT);')`
+* Create 创建数据
+创建表 :
+  * CREATE TABLE  table_name(column1,column2,column3);  
+  `cur.execute('CREATE TABLE student(ID INT, NAME TEXT, AGE INT, SCORE FLOAT);')`
+添加数据:
+  * 添加一条数据:
     * INSERT INTO table_name(column1,column2,column3,...) VALUES(value1,value2,value3,...);  
     `cur.execute("INSERT INTO student VALUES (1,'Lucy',13,89);")`
-    * INSERT INTO table_name VALUES(?,?,?,?);
+  * 添加多条数据:
+    * INSERT INTO table_name VALUES(?,?,?,?); 之后再写要放入的值
     ```py
+    # 每一项必须是元祖,哪怕只有一个值
     students = (
     (4,'LiLei',11,93),
     (5,'Bobll',12,85),
@@ -749,14 +755,22 @@ print(table_data)
     )
     ```
     `cur.executemany("INSERT INTO student VALUES(?,?,?,?);",students)`
-* Read  
+
+* Read 查询数据
 SELECT column_name,column_name FROM table_name ;
 `cur.execute("SELECT * FROM student")`
-* Update  
+  * INNER JOIN  内连接
+  SELECT column1, column2 FROM table_1 INNER JOIN table_2 ON column_x = column_y  
+  `cur.execute("SELECT emp_id, name, dept FROM employee INNER JOIN department ON employee.id = department.emp_id;").fetchall()`
+  * LEFT OUTER JOIN  左外连接
+  SELECT column1, column2 FROM table_1 LEFT OUTER JOIN table_2 ON column_x = column_y    
+  `cur.execute("SELECT emp_id, name, dept FROM employee LEFT OUTER JOIN department ON employee.id = department.emp_id;").fetchall()`
+
+* Update 更新数据
 UPDATE table_name SET column1=value1,column2=value2,... WHERE some_column=some_value;    
 `cur.execute("UPDATE student SET SCORE=99 WHERE ID=3;")`
 
-* Delete  
+* Delete 删除数据  
 DELETE FROM table_name WHERE some_column=some_value;
 `cur.execute("DELETE FROM student WHERE ID=5;")`
 
@@ -764,15 +778,7 @@ DELETE FROM table_name WHERE some_column=some_value;
 获取字段信息 PRAGMA [database.]index_info( index_name );  
 index_info Pragma 返回关于数据库索引的信息。  
 (id, name, type, notnull, default_value, primary_key)   
-`cur.execute("PRAGMA table_info(employee)").fetchall()`
-
-* INNER JOIN  
-SELECT column1, column2 FROM table_1 INNER JOIN table_2 ON column_x = column_y  
-`cur.execute("SELECT emp_id, name, dept FROM employee INNER JOIN department ON employee.id = department.emp_id;").fetchall()`
-
-* LEFT OUTER JOIN  
-SELECT column1, column2 FROM table_1 LEFT OUTER JOIN table_2 ON column_x = column_y    
-`cur.execute("SELECT emp_id, name, dept FROM employee LEFT OUTER JOIN department ON employee.id = department.emp_id;").fetchall()`
+`cur.execute("PRAGMA table_info(student)").fetchall()`
 
 <br>
 
