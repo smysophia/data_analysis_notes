@@ -23,9 +23,10 @@
     - [单行子查询](#单行子查询)
     - [多行子查询](#多行子查询)
   - [增/删/改](#增删改)
-    - [增加](#增加)
-    - [修改](#修改)
-    - [删除](#删除)
+    - [创建 CREATE](#创建-create)
+    - [增加 INSERT INTO](#增加-insert-into)
+    - [修改 UPDATE...SET...](#修改-updateset)
+    - [删除 DELETE](#删除-delete)
   - [SQL in Python](#sql-in-python)
 
 ## 基础查询语句
@@ -41,12 +42,15 @@
   * %: 代表任意多个字符,含0个
   * _: 任何单个字符
   * \: 转义符 例如: `LIKE '_\_%'; ` 第二个字符为下划线
-* `BETWEEN 值1 AND 值2;` 包含本身的两个值之间. 否定:NOT BETWEEN
+  * [ ]:字符列中的任何单一字符
+  * \[^\]:不在字符列中的任何单一字符
+* `BETWEEN 值1 AND 值2;` 包含本身的两个值之间(含值1和值2). 否定:NOT BETWEEN
 * `IN(条件1,条件2,...)` 指定条件范围. 例如: `SELECT * FROM '销售表' WHERE 店号 IN(1,3,7);`
 * `IS NULL;` 判断是否为空值,不能用 列表名=NULL 来判断,或者可以用安全等于 `<=>`. 
   * 否定: `IS NOT NULL;`
   * 例如: `SELECT * FROM 销售表 WHERE 销售数量 IS NOT NULL;`
-
+  * 处理NULL: `ISNULL(列名,0)` 将这列中含NULL的都处理为0(可以改) 或者 `IFNULL(列名,0)`
+  
 ### 排序查询
 `SELECT 字段名 FROM 表名 ORDER BY 字段名1 DESC 字段名2 DESC` 不写DESC就默认ASC(升序)
 * `ORDER BY LENGTH(字段名)` 按字段名这一列中每一个的长度排序. 
@@ -61,7 +65,7 @@
 `SELECT 函数名(实参列表) FROM 表名` 如果函数名的括号里有字段名，就要加表名
 ### 常用文本函数
 * `LEFT(字符串或字段，长度)`  字符串左边的几个字符
-* `LENGTH(字符串或字段)`    返回字符串长度. 注意这里指的是字节, 其他函数值得都是字符
+* `LENGTH(字符串或字段)`    返回字符串长度. 注意这里指的是字节, 其他函数值得都是字符. 汉字占3个字节.
 * `CONCAT(字段1,字段2,…) ` 字段连接或字符串连接
 * `LOWER(字段)` 转小写 `UPPER(字段)` 转大写
 * `TRIM(' ' FROM 字段名或字符串)`  默认去掉空格. TRIM(字段名或字符串) 同理LTRIM() RTRIM()
@@ -76,9 +80,12 @@
 * `mod(被除数,除数)` 取余数
 ### 日期函数 
 * `NOW()`  返回当前系统日期
-* `curdate()`  返回当前系统日期，不包含时间
-* `curtime()`  返回当前时间，不包含日期
-*  获取指定的部分，年、月、日、小时、分钟、秒. 例如: YEAR(日期字段) Month(日期) Day(now())
+* `CURDATE()`  返回当前系统日期，不包含时间
+* `CURTIME()`  返回当前时间，不包含日期
+*  获取指定的部分，年、月、日、小时、分钟、秒. 例如: YEAR(日期字段) Month(日期) Day(now()) DATE(日期)提取日期
+*  `DATE_ADD()` 给日期添加指定的时间间隔
+*  `DATE_SUB()` 从日期减去指定的时间间隔
+*  `DATEDIFF()` 返回两个日期之间的天数
 *  `str_to_date(str, 日期格式)`  将日期格式的字符转换成指定日期格式 例如:`str_to_date('3-30-2020','%m-%d-%Y')`
 *  `DATE_FORMAT(日期, 日期格式)` 将日期格式转成字符 例如: `DATE_FORMAT('2020/3/30','%Y年%m月%d日')`
    * %Y 四位年份
@@ -90,6 +97,12 @@
    * %h 12小时制
    * %i 分钟
    * %s 秒
+* MySQL 使用下列数据类型在数据库中存储日期或日期/时间值：
+  * DATE - 格式 YYYY-MM-DD
+  * DATETIME - 格式: YYYY-MM-DD HH:MM:SS
+  * TIMESTAMP - 格式: YYYY-MM-DD HH:MM:SS
+  * YEAR - 格式 YYYY 或 YY
+  
 ### 流程控制函数
 * `if(表达式成立，返回值，否则返回值)`  例如:`SELECT * ,IF(销售数量>200,'优秀','一般') AS 评价 FROM 销售表`
 * case 要判断的字段或表达式
@@ -112,10 +125,10 @@ FROM 商品表;
 ```
 ### 聚合函数
 聚合函数是对一组数据（一列或多列）进行处理，返回单个结果
-* SUM（总和）、MAX（最大值），MIN（最小值），AVG（平均值）以及COUNT（计数）
+* SUM（总和）、MAX（最大值），MIN（最小值），AVG（平均值）以及COUNT（计数不包含NULL值）
   * 例如: `SELECT SUM(销售数量) AS 求和,AVG(销售数量) AS 求平均,MAX(销售数量) AS 最大值,MIN(销售数量) AS 最小值,COUNT(销售数量) AS 计数 FROM 销售表;`
 * Count(distinct 字段名) 计算字段非重复值的个数, 例如:`SELECT Count(DISTINCT 店号) FROM 销售表` 返回12, 有12家店
-* Count(*) 计算总行数, 全空行 不计入. 例如:`SELECT Count(*) FROM 销售表` 返回1031, 有1031条非全空的数据
+* Count(*) 计算总行数, 全空行 不计入. 例如:`SELECT Count(*) FROM 销售表` 返回1031, 即有1031条非全空的数据
 
 ### 分组聚合函数GROUP BY
 语法:
@@ -158,6 +171,7 @@ SELECT [DISTINCT] 字段名 FROM 表名
 ## 多表合并
 UNION ALL 不去重
 UNION 去重
+
 *  SELECT语句拥有相同的列数，而且字段的排放顺序相同
    *  SELECT * FROM 表名1 UNION ALL SELECT * FROM 表名2;
 * 如果两张原始表的顺序不一致，你需要手动在SELECT后面写字段强行把他顺序变成一致。
@@ -244,14 +258,67 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
   * 例如先筛选出 成绩表 里的所有列,然后按照 子查询筛选符合条件的: `SELECT * FROM 成绩表 WHERE EXISTS (SELECT 姓名 FROM 花名册 WHERE 成绩表.姓名=姓名 AND 源='倚天')`
 
 ## 增/删/改
-### 增加
-* 方法1: 字段名和值一一对应 `insert into 表名(字段名1,字段名2…) Valuses(值1,值2….);`
-* 方法2: 字段省略，但是值的位置必需和表中的字段位置一样，顺序不能颠倒 `insert into 表名 Valuses(值1,值2….);`
-* 方法三: set `insert into 表名 set 字段名1=值1，字段名2=值2，`不支持插入多行,不支持子查询
-* 插入多行: `insert into 表名 Valuses(值1,值2….),(值1,值2….),(值1,值2….)`
-* 添加子查询: 例如: `INSERT INTO 销售表 SELECT 日期,店号,商品编码,销售数量 FORM 销售表2 Where 销售数量>300；`
+### 创建 CREATE
+* CREATE DATABASE 数据库名字;
+* CREATE TABLE 表名称;
+(
+列名称1 数据类型,
+列名称2 数据类型,
+列名称3 数据类型,
+....
+);
+* 有以下数据类型:
+  * 整形:
+    * integer(size) 4 byte around 4 billion all positive
+    * int(size) 4 byte
+    * smallint(size)  2 byte
+    * tinyint(size)
+  * 浮点型: 
+    * "size" 规定数字的最大位数。"d" 规定小数点右侧的最大位数。
+    * decimal(size,d)
+    * numeric(size,d)
+    * FLOAT(size,d)
+    * DOUBLE(size,d)
+  * 字符串:
+    * char(size) 容纳固定长度的字符串
+    * varchar(size) 容纳可变长度的字符串,做大255
+    * text 存放最大长度为 65,535 个字符的字符串。
+  * 日期:
+    * date(yyyymmdd) 格式：YYYY-MM-DD
+    * datetime() 格式：YYYY-MM-DD HH:MM:SS
+    * time() 格式：HH:MM:SS 
+    * year() 如果2位格式所允许的值70到69，表示从1970到2069。
+* 有以下约束(constraints)
+  可以在创建表时规定约束（通过 CREATE TABLE 语句），或者在表创建之后也可以（通过 ALTER TABLE 语句）。
+  * NOT NULL
+  * UNIQUE: 注意MYSQL在申明完所有列的最后创建 `UNIQUE (列名)`, SQL等可以在申明列的时候直接加上UNIQUE
+  * PRIMARY KEY: 约束唯一标识数据库表中的每条记录。默认NOT NULL和UNIQUE. MYSQL在最后申明.`PRIMARY KEY (列名)`
+  * FOREIGN KEY: 外键.一个表中的 FOREIGN KEY 指向另一个表中的 PRIMARY KEY。MYSQL在最后申明 `FOREIGN KEY (列名) REFERENCES 指向的表名(列名)`
+  * CHECK: 限制列中的值的范围。MYSQL在最后申明, 例如: `CHECK (Id_P>0)` ID必须大于0
+  * DEFAULT:向列中插入默认值。直接在申明的时候协商即可. `DEFAULT '默认值'`
+  * AUTO_INCREMENT: MySQL 使用 AUTO_INCREMENT 关键字来执行 auto-increment 任务。默认地，AUTO_INCREMENT 的开始值是 1，每条新记录递增 1。
+  
+* CREATE INDEX index_name ON table_name (column_name);在常常被搜索的列（以及表）上面创建索引。
+  * ALTER TABLE 创建之后修改表
+  * ALTER TABLE table_name
+  ADD column_name datatype; 增加列
+  * ALTER TABLE table_name 
+  DROP COLUMN column_name; 删除列.某些数据库系统不允许这种在数据库表中删除列的方式 (DROP COLUMN column_name)。
+  * ALTER TABLE table_name
+  ALTER COLUMN column_name datatype; 改变数据类型
+  * ALTER TABLE table_name
+  ADD/DROP 约束条件;
+  * ALTER TABLE Persons AUTO_INCREMENT=100; 要让 AUTO_INCREMENT 序列以其他的值起始
 
-### 修改
+### 增加 INSERT INTO
+* 方法1: 字段名和值一一对应 `INSERT INTO 表名(字段名1,字段名2…) VALUES(值1,值2….);`
+* 方法2: 字段省略，但是值的位置必需和表中的字段位置一样，顺序不能颠倒 `INSERT INTO 表名 VALUES(值1,值2….);`
+* 方法三: SET `INSERT INTO 表名 SET 字段名1=值1，字段名2=值2，`不支持插入多行,不支持子查询
+* 插入多行: `INSERT INTO 表名 VALUES (值1,值2….),(值1,值2….),(值1,值2….)`
+* 添加子查询: 例如: `INSERT INTO 销售表 SELECT 日期,店号,商品编码,销售数量 FORM 销售表2 WHERE 销售数量>300；`
+* 备份表: `INSERT INTO 新表名 SELECT 列名 FROM 表名`
+
+### 修改 UPDATE...SET...
 * 修改单表数据
 先锁定表，然后锁定字段，最后筛选
   ```SQL
@@ -262,7 +329,7 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
 * 修改多表数据
   ```SQL
   update 表1 别名
-  innter/left/right join 表2  别名
+  inner/left/right join 表2  别名
   ON 连接条件
   set 字段名1=值1，字段名2=值2，…..
   where 筛选条件;
@@ -275,7 +342,7 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
     set 师傅='唐僧'
     WHERE 徒弟='孙悟空';
     ```
-### 删除
+### 删除 DELETE
 * 单表删除: `delete from 表名 where 筛选条件` 例如删除所有电话结尾为4的记录.`DELETE FROM 单表删除 WHERE 电话 LIKE '%4'`
 * 多表删除:
   ```SQL
@@ -292,7 +359,9 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
   ON 序号=师傅编号
   WHERE 徒弟= '孙悟空';
   ```
-* 删除整表:  `truncate table 表名;  `  不能加where
+* 删除整表: 
+* `DROP TABLE 表名` 删除表（表的结构、属性以及索引也会被删除）
+*  `truncate table 表名;  `  不能加where.仅仅需要除去表内的数据
 
 ## SQL in Python
 import pymysql
