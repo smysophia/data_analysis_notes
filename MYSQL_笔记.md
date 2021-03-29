@@ -260,7 +260,7 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
 ## 增/删/改
 ### 创建 CREATE
 * CREATE DATABASE 数据库名字;
-* CREATE TABLE 表名称;
+* CREATE TABLE 表名称
 (
 列名称1 数据类型,
 列名称2 数据类型,
