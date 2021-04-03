@@ -53,6 +53,7 @@ Matplotlib 笔记
     `plt.show()`
 
 名词解释:
+<br>
   <img src='https://github.com/smysophia/markdown_pictures/blob/main/plt1.jpg' title='axes' width="250" height="300">
 
 ## 折线图
@@ -196,6 +197,7 @@ plt.show()
 
   
 各个设置的名字:
+<br>
   <img src='https://github.com/smysophia/markdown_pictures/blob/main/plt2.jpg' title='axes' width="250" height="300">
 <br>
 <br>
@@ -246,11 +248,13 @@ sns.pairplot(data, hue, vars, kind, diag_kind)
 * vars：可视化的列（默认可视化所有列间的关系） `sns.pairplot(data, hue='species', vars=['sepal_length', 'sepal_width'])`
 * kind：默认scatter 散点，reg 添加拟合线 ['scatter', 'hist', 'hex', 'kde', 'reg', 'resid']
 * diag_kind：对角线的图像，默认hist 直方图，kde核密度估计图
+<br>
  <img src='https://github.com/smysophia/markdown_pictures/blob/main/iris%20pairplot.png' title='pairplot' width="150" height="150">
 
  sns.factorplot()
 draw a categorical plot onto a FacetGrid.
  `sns.factorplot(x='accommodates', y='price', data=data, estimator=np.median, size=4.5, aspect=1.3, color='m')`
+ <br>
   <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20factorplot.png' title='pairplot' width="150" height="150">
 
 
@@ -258,17 +262,20 @@ draw a categorical plot onto a FacetGrid.
 ### 类别散布图:
 * 分布散点图 sns.stripplot()
    `sns.stripplot(x='tip', y='day', data=tips_data)`
+  <br>
  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20stripplot.png' title='factorplot' width="150" height="150">
 
 * 分族散点图 sns.swarmplot() 
   `sns.swarmplot(x='tip', y='day', data=tips_data, hue='sex')`
   * dodge=False 可以设置为True 分开类别  will separate the strips for different hue levels 
   
+  <br>
   <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20swarmplot.png' title='stripplot' width="150" height="150">
 
 类别数据可视化:
 * 盒子图 sns.boxplot(x,y,data,hue)
    `sns.boxplot(x='day', y='tip', data=tips_data, hue='sex')`
+   <br>
     <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20boxplot.png' title='stripplot' width="150" height="150">
 * 小提琴图 sns.violinplot()
 * 热力图 sns.heatmap()
@@ -276,7 +283,7 @@ draw a categorical plot onto a FacetGrid.
   * annot:bool 每一块是否标记数值
   * fmt: 如果annot为True 设置标记数值的格式, 例如 fmt='.0f'
   * linewidths 每一小块是否要画线
-  
+  <br>
   <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20heatmap.png' title='heatmap' width="150" height="150">
 ### 类别内统计图: 
 * 柱状图 
