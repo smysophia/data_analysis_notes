@@ -13,13 +13,13 @@
     - [图例](#图例)
     - [第二坐标轴设置](#第二坐标轴设置)
   - [其他设置](#其他设置)
-- [Seaborn笔记](#seaborn笔记)
+  - [# Seaborn笔记](#-seaborn笔记)
   - [对列的统计](#对列的统计)
   - [单变量分布](#单变量分布)
   - [双变量分布](#双变量分布)
   - [变量关系](#变量关系)
   - [类别散布](#类别散布)
-- [Bokeh](#bokeh)
+  - [# Bokeh](#-bokeh)
   - [接口charts 版本0.12.5 更高版本不使用](#接口charts-版本0125-更高版本不使用)
     - [Scatter 散点图](#scatter-散点图)
     - [柱状图](#柱状图-1)
@@ -139,6 +139,7 @@ plt.subplots(nrows, ncols, sharex, sharey)
     * ax.set_xticks(列表), ax.set_yticks()
   * 设置刻度标签
     * 使用plt.xticks(列表), plt.yticks()进行配置 `plt.xticks([0, 100, 200], ['x1', 'x2', 'x3'])`
+    * plt.xticks(rotation=90) 竖着写刻度
     * ax.set_xticklabels(), ax.set_yticklabels() `ax.set_xticklabels(['x1', 'x2', 'x3', 'x4', 'x5'])`
   ### 图例 
   * 图例 legend(labels,loc)
@@ -159,11 +160,13 @@ plt.subplots(nrows, ncols, sharex, sharey)
 <br>
 
 # Seaborn笔记
+-------------------------
 `import seaborn as sns`
 ## 对列的统计
 Show the counts of observations in each categorical bin using bars.
 sns.countplot(x=None, y=None, hue=None, data=None)
 `sns.countplot(data=df, x='group')`
+
 ## 单变量分布
 sns.kdeplot(data)
 * 核密度估计图(kernel density estimation)
@@ -171,23 +174,26 @@ sns.distplot(kde=True, hist=True, rug=False)
 * kde 核密度图
 * hist 直方图
 * rug 观测条
+  
 ## 双变量分布
 sns.jointplot(x, y, data, kind)
-* x, y 二维数据，向量或字符串
+* x, y 二维数据，向量或字符串. x y的数据类型必须是数值
 * data，如果x, y是字符串data 应该为DataFrame
-* kind=‘scatter’ 默认二维散点图. 可以设置'hex', 'kde'
+* kind='scatter' 默认二维散点图. ['scatter', 'hist', 'hex', 'kde', 'reg', 'resid']
   ```py
   df = pd.DataFrame({'x': np.random.randn(500),
                    'y': np.random.randn(500)})
   # 二维散点图
   sns.jointplot(x='x', y='y', data=df) 
   ```
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns.png' title='sns jointplot' width="150" height="150">
+
 ## 变量关系
 sns.pairplot(data, hue, vars, kind, diag_kind)
 * data: DataFrame数据集，列为变量，行为样本
 * hue：数据集中作为类别的列名 `sns.pairplot(data, hue='species')`
 * vars：可视化的列（默认可视化所有列间的关系） `sns.pairplot(data, hue='species', vars=['sepal_length', 'sepal_width'])`
-* kind：默认scatter 散点，reg 添加拟合线
+* kind：默认scatter 散点，reg 添加拟合线 ['scatter', 'hist', 'hex', 'kde', 'reg', 'resid']
 * diag_kind：对角线的图像，默认hist 直方图，kde核密度估计图
 
 ## 类别散布
@@ -200,13 +206,16 @@ sns.pairplot(data, hue, vars, kind, diag_kind)
 * 分族散点图 sns.swarmplot() `sns.swarmplot(x='tip', y='day', data=tips_data, hue='sex')`
   * dodge=False 可以设置为True 分开类别  will separate the strips for different hue levels 
 类别数据可视化:
-* 盒子图 sns.boxplot() `sns.boxplot(x='day', y='tip', data=tips_data, hue='sex')`
+* 盒子图 sns.boxplot(x,y,data,hue) `sns.boxplot(x='day', y='tip', data=tips_data, hue='sex')`
 * 小提琴图 sns.violinplot()
 类别内统计图:
 * 柱状图 sns.barplot()
 * 点图 sns.pointplot()
 
+<br>
+
 # Bokeh
+---------------------
 `from bokeh.io import output_notebook, output_file, show`
 `from bokeh.charts import Scatter, Bar, BoxPlot, Chord`
 show in Jupyter notebook
