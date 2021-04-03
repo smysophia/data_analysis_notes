@@ -183,6 +183,7 @@ for patch in ax.patches:
 
 plt.show()
 ```
+<br>
 [patches.Rectangle 官方说明](https://matplotlib.org/stable/api/_as_gen/matplotlib.patches.Rectangle.html#matplotlib.patches.Rectangle)
   
 
@@ -217,7 +218,8 @@ plt.show()
 Show the counts of observations in each categorical bin using bars.
 sns.countplot(x=None, y=None, hue=None, data=None)
 `sns.countplot(data=df, x='room_type')`
-  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20example.png' title='axes' width="150" height="150">
+<br>
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20example.png' title='axes' width="200" height="200">
 
 
 ## 单变量分布
@@ -239,7 +241,7 @@ sns.jointplot(x, y, data, kind)
   # 二维散点图
   sns.jointplot(x='x', y='y', data=df) 
   ```
-  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns.png' title='sns jointplot' width="150" height="150">
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns.png' title='sns jointplot' width="200" height="200">
 
 ## 变量关系
 sns.pairplot(data, hue, vars, kind, diag_kind)
@@ -249,13 +251,13 @@ sns.pairplot(data, hue, vars, kind, diag_kind)
 * kind：默认scatter 散点，reg 添加拟合线 ['scatter', 'hist', 'hex', 'kde', 'reg', 'resid']
 * diag_kind：对角线的图像，默认hist 直方图，kde核密度估计图
 <br>
- <img src='https://github.com/smysophia/markdown_pictures/blob/main/iris%20pairplot.png' title='pairplot' width="150" height="150">
+ <img src='https://github.com/smysophia/markdown_pictures/blob/main/iris%20pairplot.png' title='pairplot' width="200" height="200">
 
  sns.factorplot()
 draw a categorical plot onto a FacetGrid.
  `sns.factorplot(x='accommodates', y='price', data=data, estimator=np.median, size=4.5, aspect=1.3, color='m')`
  <br>
-  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20factorplot.png' title='pairplot' width="150" height="150">
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20factorplot.png' title='pairplot' width="200" height="200">
 
 
 ## 类别散布
@@ -263,20 +265,20 @@ draw a categorical plot onto a FacetGrid.
 * 分布散点图 sns.stripplot()
    `sns.stripplot(x='tip', y='day', data=tips_data)`
   <br>
- <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20stripplot.png' title='factorplot' width="150" height="150">
+ <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20stripplot.png' title='factorplot' width="200" height="200">
 
 * 分族散点图 sns.swarmplot() 
   `sns.swarmplot(x='tip', y='day', data=tips_data, hue='sex')`
   * dodge=False 可以设置为True 分开类别  will separate the strips for different hue levels 
   
   <br>
-  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20swarmplot.png' title='stripplot' width="150" height="150">
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20swarmplot.png' title='stripplot' width="200" height="200">
 
 类别数据可视化:
 * 盒子图 sns.boxplot(x,y,data,hue)
    `sns.boxplot(x='day', y='tip', data=tips_data, hue='sex')`
    <br>
-    <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20boxplot.png' title='stripplot' width="150" height="150">
+    <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20boxplot.png' title='stripplot' width="200" height="200">
 * 小提琴图 sns.violinplot()
 * 热力图 sns.heatmap()
   `seaborn.heatmap(data, vmin=None, vmax=None, cmap=None,  annot=None, fmt='.2g', linewidths=0, linecolor='white', xticklabels='auto', yticklabels='auto',**kwargs)`
@@ -284,7 +286,7 @@ draw a categorical plot onto a FacetGrid.
   * fmt: 如果annot为True 设置标记数值的格式, 例如 fmt='.0f'
   * linewidths 每一小块是否要画线
   <br>
-  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20heatmap.png' title='heatmap' width="150" height="150">
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20heatmap.png' title='heatmap' width="200" height="200">
 ### 类别内统计图: 
 * 柱状图 
   sns.barplot(x=None, y=None, hue=None, data=None, color=None, palette=None)
