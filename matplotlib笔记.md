@@ -12,14 +12,18 @@
     - [刻度](#刻度)
     - [图例](#图例)
     - [第二坐标轴设置](#第二坐标轴设置)
+    - [matplotlib.patches 补丁](#matplotlibpatches-补丁)
   - [其他设置](#其他设置)
-  - [# Seaborn笔记](#-seaborn笔记)
+- [Seaborn笔记](#seaborn笔记)
+  - [加载自带例子](#加载自带例子)
   - [对列的统计](#对列的统计)
   - [单变量分布](#单变量分布)
   - [双变量分布](#双变量分布)
   - [变量关系](#变量关系)
   - [类别散布](#类别散布)
-  - [# Bokeh](#-bokeh)
+    - [类别散布图:](#类别散布图)
+    - [类别内统计图:](#类别内统计图)
+- [Bokeh](#bokeh)
   - [接口charts 版本0.12.5 更高版本不使用](#接口charts-版本0125-更高版本不使用)
     - [Scatter 散点图](#scatter-散点图)
     - [柱状图](#柱状图-1)
@@ -47,6 +51,9 @@ Matplotlib 笔记
     `random_data = np.random.randn(100)`
 * 绘制和显示
     `plt.show()`
+
+名词解释:
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/plt1.jpg' title='axes' width="250" height="300">
 
 ## 折线图
 ***
@@ -124,22 +131,22 @@ plt.subplots(nrows, ncols, sharex, sharey)
 ## 设置标题/刻度/图例/第二轴
   ***
   ### 标题
-  * 图的名字
+  * 图的名字 title
     * plt.title('Title', color, fontsize=9, fontfamily='sans-serif', fontstyle='italic')
     * ax.set_title('Title')
-  * 坐标轴的名字
+  * 坐标轴的名字 xlabel
     * plt.xlabel('label name'), plt.ylabel()
     * ax.set_xlabel('label name'), ax.set_ylabel() 
   ### 刻度
-  * 刻度的范围
+  * 刻度的范围 xlim
     * plt.xlim(列表), plt.ylim() 例如: `plt.xlim([0,500])`
     * ax.set_xlim(列表), ax.set_ylim() 
-  * 设置显示的刻度 
+  * 设置显示的刻度 xticks
     * plt.xticks(列表), plt.yticks() 例如: `plt.xticks([0, 100, 200])`
+    * plt.xticks(rotation=90) 竖着写刻度标签
     * ax.set_xticks(列表), ax.set_yticks()
-  * 设置刻度标签
+  * 设置刻度标签 xticklabels
     * 使用plt.xticks(列表), plt.yticks()进行配置 `plt.xticks([0, 100, 200], ['x1', 'x2', 'x3'])`
-    * plt.xticks(rotation=90) 竖着写刻度
     * ax.set_xticklabels(), ax.set_yticklabels() `ax.set_xticklabels(['x1', 'x2', 'x3', 'x4', 'x5'])`
   ### 图例 
   * 图例 legend(labels,loc)
@@ -148,6 +155,37 @@ plt.subplots(nrows, ncols, sharex, sharey)
   ### 第二坐标轴设置
   * ax.right_ax.set_ylabel
   * ax.right_ax.set_ylim(列表)
+  
+  ### matplotlib.patches 补丁
+  * 柱状图
+  `matplotlib.patches.Rectangle(xy, width, height, angle=0.0, **kwargs)`
+  之前用bar绘图,ax.patches返回列表形式的`Rectangle(xy=(-0.4, 0), width=0.8, height=2127, angle=0)` 
+  有以下方法:
+    * get_height(self)
+    * set_height(self, h)
+    * get_width(self)
+    * set_width(self, w)
+    * get_x(self)
+    * set_x(self, x)
+    * get_xy(self)
+    * set_xy(self, xy)
+实例:
+```py
+fig, ax = plt.subplots()
+sns.barplot(data=data_roomtype, x= 'room_type', y='count', ax=ax, palette="husl")
+
+for patch in ax.patches:
+    # 调整bar的宽度从0.8变为0.5
+    patch.set_width(0.5) 
+    # 调整x的起始为止
+    patch.set_x(patch.get_x() + 0.3 * .5)
+
+plt.show()
+```
+[patches.Rectangle 官方说明](https://matplotlib.org/stable/api/_as_gen/matplotlib.patches.Rectangle.html#matplotlib.patches.Rectangle)
+  
+
+
 
 ## 其他设置
 ***
@@ -156,24 +194,37 @@ plt.subplots(nrows, ncols, sharex, sharey)
 * 解决保存图像是负号'-'显示为方块的问题
   `matplotlib.rcParams['axes.unicode_minus'] = False`
 
+  
+各个设置的名字:
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/plt2.jpg' title='axes' width="250" height="300">
 <br>
 <br>
 
 # Seaborn笔记
--------------------------
+
 `import seaborn as sns`
+
+## 加载自带例子
+
+`tips_data = sns.load_dataset('tips')`
+`titanic_data = sns.load_dataset("titanic")`
+`exe_data = sns.load_dataset('exercise')`
+`iris_data = sns.load_dataset('iris')`
+[seaborn datasets](https://github.com/mwaskom/seaborn-data)
 ## 对列的统计
 Show the counts of observations in each categorical bin using bars.
 sns.countplot(x=None, y=None, hue=None, data=None)
-`sns.countplot(data=df, x='group')`
+`sns.countplot(data=df, x='room_type')`
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20example.png' title='axes' width="150" height="150">
+
 
 ## 单变量分布
-sns.kdeplot(data)
-* 核密度估计图(kernel density estimation)
+* sns.kdeplot(data)
+ 核密度估计图(kernel density estimation)
 sns.distplot(kde=True, hist=True, rug=False)
-* kde 核密度图
-* hist 直方图
-* rug 观测条
+  * kde 核密度图
+  * hist 直方图
+  * rug 观测条
   
 ## 双变量分布
 sns.jointplot(x, y, data, kind)
@@ -191,31 +242,52 @@ sns.jointplot(x, y, data, kind)
 ## 变量关系
 sns.pairplot(data, hue, vars, kind, diag_kind)
 * data: DataFrame数据集，列为变量，行为样本
-* hue：数据集中作为类别的列名 `sns.pairplot(data, hue='species')`
+* hue：分类.数据集中作为类别的列名 `sns.pairplot(data, hue='species')`
 * vars：可视化的列（默认可视化所有列间的关系） `sns.pairplot(data, hue='species', vars=['sepal_length', 'sepal_width'])`
 * kind：默认scatter 散点，reg 添加拟合线 ['scatter', 'hist', 'hex', 'kde', 'reg', 'resid']
 * diag_kind：对角线的图像，默认hist 直方图，kde核密度估计图
+ <img src='https://github.com/smysophia/markdown_pictures/blob/main/iris%20pairplot.png' title='pairplot' width="150" height="150">
+
+ sns.factorplot()
+draw a categorical plot onto a FacetGrid.
+ `sns.factorplot(x='accommodates', y='price', data=data, estimator=np.median, size=4.5, aspect=1.3, color='m')`
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20factorplot.png' title='pairplot' width="150" height="150">
+
 
 ## 类别散布
-加载seaborn自带数据
-`tips_data = sns.load_dataset('tips')`
-`titanic_data = sns.load_dataset("titanic")`
-`exe_data = sns.load_dataset('exercise')`
-类别散布图:
-* 分布散点图 sns.stripplot() `sns.stripplot(x='tip', y='day', data=tips_data)`
-* 分族散点图 sns.swarmplot() `sns.swarmplot(x='tip', y='day', data=tips_data, hue='sex')`
+### 类别散布图:
+* 分布散点图 sns.stripplot()
+   `sns.stripplot(x='tip', y='day', data=tips_data)`
+ <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20stripplot.png' title='factorplot' width="150" height="150">
+
+* 分族散点图 sns.swarmplot() 
+  `sns.swarmplot(x='tip', y='day', data=tips_data, hue='sex')`
   * dodge=False 可以设置为True 分开类别  will separate the strips for different hue levels 
+  
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20swarmplot.png' title='stripplot' width="150" height="150">
+
 类别数据可视化:
-* 盒子图 sns.boxplot(x,y,data,hue) `sns.boxplot(x='day', y='tip', data=tips_data, hue='sex')`
+* 盒子图 sns.boxplot(x,y,data,hue)
+   `sns.boxplot(x='day', y='tip', data=tips_data, hue='sex')`
+    <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20boxplot.png' title='stripplot' width="150" height="150">
 * 小提琴图 sns.violinplot()
-类别内统计图:
-* 柱状图 sns.barplot()
+* 热力图 sns.heatmap()
+  `seaborn.heatmap(data, vmin=None, vmax=None, cmap=None,  annot=None, fmt='.2g', linewidths=0, linecolor='white', xticklabels='auto', yticklabels='auto',**kwargs)`
+  * annot:bool 每一块是否标记数值
+  * fmt: 如果annot为True 设置标记数值的格式, 例如 fmt='.0f'
+  * linewidths 每一小块是否要画线
+  
+  <img src='https://github.com/smysophia/markdown_pictures/blob/main/sns%20heatmap.png' title='heatmap' width="150" height="150">
+### 类别内统计图: 
+* 柱状图 
+  sns.barplot(x=None, y=None, hue=None, data=None, color=None, palette=None)
+  * [palette可以选择的颜色](https://seaborn.pydata.org/tutorial/color_palettes.html)
 * 点图 sns.pointplot()
 
 <br>
 
 # Bokeh
----------------------
+
 `from bokeh.io import output_notebook, output_file, show`
 `from bokeh.charts import Scatter, Bar, BoxPlot, Chord`
 show in Jupyter notebook
@@ -248,7 +320,8 @@ p.yaxis.axis_label = '脉搏'
 图形元素:`bokeh.plotting.figure.circle(x, y, size, color, alpha)`
 柱状图:`p.vbar(x=exe_data['id'],top=exe_data['pulse'],width=0.6)`
   
-   
+<br>
+
 # 3D绘图
 `from mpl_toolkits.mplot3d import Axes3D`
 ```py
