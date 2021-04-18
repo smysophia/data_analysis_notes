@@ -11,6 +11,7 @@
     - [流程控制函数](#流程控制函数)
     - [聚合函数](#聚合函数)
     - [分组聚合函数GROUP BY](#分组聚合函数group-by)
+  - [窗口函数 (MYSQL 8.0以上版本)](#窗口函数-mysql-80以上版本)
   - [总结:SELECT语法结构和运算顺序](#总结select语法结构和运算顺序)
   - [多表合并](#多表合并)
   - [连接查询](#连接查询)
@@ -22,6 +23,7 @@
   - [子查询](#子查询)
     - [单行子查询](#单行子查询)
     - [多行子查询](#多行子查询)
+    - [创建临时表](#创建临时表)
   - [增/删/改](#增删改)
     - [创建 CREATE](#创建-create)
     - [增加 INSERT INTO](#增加-insert-into)
@@ -30,6 +32,7 @@
   - [SQL in Python](#sql-in-python)
 
 ## 基础查询语句
+查看表的信息:DESC table_name;
 ### 基本查询/去重/连接
 * `select 查询列表 from 表名;` 查询列表可以是：表中的字段、常量值、表达式、函数
 * `select 原名 as 别名 from 表名;` 重命名列表名
@@ -44,12 +47,14 @@
   * \: 转义符 例如: `LIKE '_\_%'; ` 第二个字符为下划线
   * [ ]:字符列中的任何单一字符
   * \[^\]:不在字符列中的任何单一字符
+  * 例如:`SELECT * FROM tbl WHERE runoob_author LIKE '%COM'`
 * `BETWEEN 值1 AND 值2;` 包含本身的两个值之间(含值1和值2). 否定:NOT BETWEEN
 * `IN(条件1,条件2,...)` 指定条件范围. 例如: `SELECT * FROM '销售表' WHERE 店号 IN(1,3,7);`
 * `IS NULL;` 判断是否为空值,不能用 列表名=NULL 来判断,或者可以用安全等于 `<=>`. 
   * 否定: `IS NOT NULL;`
   * 例如: `SELECT * FROM 销售表 WHERE 销售数量 IS NOT NULL;`
   * 处理NULL: `ISNULL(列名,0)` 将这列中含NULL的都处理为0(可以改) 或者 `IFNULL(列名,0)`
+  * 注意: 如果我们判断 IF NULL != 0 返回的是FALSE. IF NULL = 0 返回的也是FALSE. NULL不能判断
   
 ### 排序查询
 `SELECT 字段名 FROM 表名 ORDER BY 字段名1 DESC 字段名2 DESC` 不写DESC就默认ASC(升序)
@@ -74,7 +79,7 @@
 * `LPAD(字符串，字符位数，'占位符号') `  左填充 同理RPAD()
 * `REPLACE(字符串，替换谁，换成什么)`  字符串替换
 ### 数学函数
-* `round(数)` 四舍五入
+* `round(数,保留几位小数)` 四舍五入
 * `ceil(数)`  向上取整 ceil() 向下取整
 * `truncate(数,截取小数点后几位)` 例如: `truncate(7.30118,1)` 返回7.3
 * `mod(被除数,除数)` 取余数
@@ -84,10 +89,16 @@
 * `CURTIME()`  返回当前时间，不包含日期
 *  获取指定的部分，年、月、日、小时、分钟、秒. 例如: YEAR(日期字段) Month(日期) Day(now()) DATE(日期)提取日期
 *  `DATE_ADD()` 给日期添加指定的时间间隔
-*  `DATE_SUB()` 从日期减去指定的时间间隔
-*  `DATEDIFF()` 返回两个日期之间的天数
-*  `str_to_date(str, 日期格式)`  将日期格式的字符转换成指定日期格式 例如:`str_to_date('3-30-2020','%m-%d-%Y')`
-*  `DATE_FORMAT(日期, 日期格式)` 将日期格式转成字符 例如: `DATE_FORMAT('2020/3/30','%Y年%m月%d日')`
+*  `DATE_SUB()` 从日期减去指定的时间间隔.DATE_SUB(date, INTERVAL expr TYPE).例如:`update 订单信息表 set call_time= date_sub(call_time, interval 11 hour);  `
+   *  type:SECOND/MINUTE/HOUR/DAY/WEEK/MONTH/QUARTER/YEAR
+*  `DATEDIFF(日期1, 日期2)` 返回两个日期之间相差的天数.
+   * 日期1-日期2.如果日期1比日期2大，结果为正；如果日期1比日期2小，结果为负。
+* `timestampdiff(时间类型, 日期1, 日期2)` 返回两个日期之间相差的(天数/小时数/分钟数/秒数)
+  * 时间类型:year,month,week,day,hour,minute,second
+  * 日期2-日期1.日期1大于日期2，结果为负，日期1小于日期2，结果为正。
+*  `str_to_date(str, '日期格式')`  将日期格式的字符转换成指定日期格式 例如:`str_to_date('3-30-2020','%m-%d-%Y')`
+*  `DATE_FORMAT(日期, '日期格式')` 将日期格式转成字符 例如: `DATE_FORMAT('2020/3/30','%Y年%m月%d日')`
+   *  可以用于截取DATETIME为DATE: `DATE_FORMAT(datetime的列名,'%Y-%m-%d') AS 日期`
    * %Y 四位年份
    * %y 2位数年份
    * %m 月份
@@ -104,12 +115,12 @@
   * YEAR - 格式 YYYY 或 YY
   
 ### 流程控制函数
-* `if(表达式成立，返回值，否则返回值)`  例如:`SELECT * ,IF(销售数量>200,'优秀','一般') AS 评价 FROM 销售表`
+* `if(表达式，成立返回值，否则返回值)`  例如:`SELECT * ,IF(销售数量>200,'优秀','一般') AS 评价 FROM 销售表`
 * case 要判断的字段或表达式
-  when 常量1/条件1 then 要显示的值1或语句1;
-  when 常量2/条件2 then 要显示的值2或语句2;
+  when 常量1/条件1 then 要显示的值1或语句1
+  when 常量2/条件2 then 要显示的值2或语句2
   ….
-  else 要显示的值n或语句n;
+  else 要显示的值n或语句n
   end
 例如:
 ```SQL
@@ -137,7 +148,12 @@ FROM 表名
 WHERE 条件
 GROUP BY 字段名或分组表达式, 字段名2
 ORDER BY 字段名
-LIMIT 10;   # 先排序,再取前几
+LIMIT 10;   # 先排序,再取前几  
+  
+LIMIT用法:
+* LIMIT y OFFSET x 分句表示查询结果跳过 x 条数据，读取前 y 条数据, 偏移量从0开始.例如`LIMIT 9 OFFSET 1`, 跳过第一行,读取9行
+* LIMIT x,y: x为偏移量 例如`LIMIT 9,1` 的意思跳过9行,读取一行
+* LIMIT 后不能跟表达式,只能为实数.
 
 例如:
 ```SQL
@@ -157,6 +173,43 @@ WHERE 日期 BETWEEN '2020-01-05' AND '2020-01-06'
 GROUP BY 店号
 HAVING 销售总量 > 7000;
 ```
+
+## 窗口函数 (MYSQL 8.0以上版本)
+OLAP（Online Analytical Processing,联机分析处理）
+* 作用：  
+  解决排名问题，e.g.每个班级按成绩排名  
+  解决TOPN问题，e.g.每个班级前两名的学生  
+* 语法：
+  select 窗口函数 over (partition by 用于分组的列名， order by 用于排序的列名 DESC)
+  * 例如通过partition by将班级分类，相当于之前用过的group by子句功能，但是group by子句分类汇总会改变原数据的行数，而用窗口函数自救保持原行数；
+  * 通过order by将成绩降序排列，与之前学的order by子句用法一样，后边可以升序asc或者降序desc
+* 专用窗口函数: 括号里不需要填东西
+  * rank() 并列排名后会占名额,例如: 1,1,3,4,4,6,...
+  * dense_rank() 并列排名不占名额,例如: 1,2,3,3,3,4,5,...
+  * row_number() 忽略并列. 例如:1,2,3,4,5,6,...
+* 聚合窗口函数: 括号里填聚合函数作用的列名
+  聚合函数作为窗口函数，是起到"累加/累计"的效果，比如，就是截止到本行，最大值？最小值是多少
+  需要使用ORDER BY, 不过不用ORDER BY 就没有累加累计的效果了.
+  * max()，min()，count()，sum()，avg()
+* 移动平均:
+  ROWS BETWEEN 一个时间点 AND 一个时间点 (只有一个时间点的话BETWEEN可以省略)
+  例如:`AVG(value)OVER(ORDER BY value ROWS BETWEEN 2 preceding AND 1 FOLLOWING)`
+  * n PRECEDING : 前n行
+  * n FOLLOWING：后n行
+  * CURRENT ROW： 当前行
+  * UNBOUNDED PRECEDING：窗口第一行
+  * UNBOUNDED FOLLOWING：窗口的最后一行
+* 常见错误:
+`select*, row_number() over(partition by 姓名 order by 成绩 desc） AS ranking FROM test WHERE ranking<=2`
+会报错.因为按照sql运行顺序，where后边不能加别名，因为select子句在where子句之后运行. HAVING 也不行
+You cannot use the alias 'ranking' of an expression containing a window function in this context.
+* TOP N 问题模板
+  ```SQL
+  SELECT *
+  FROM (SELECT*,row_number() over (PARTITION BY 姓名 ORDER BY 成绩 DESC) AS ranking 
+  FROM test) AS newtest
+  WHERE ranking<=N;
+  ```
 
 ## 总结:SELECT语法结构和运算顺序
 SELECT [DISTINCT] 字段名 FROM 表名
@@ -230,8 +283,12 @@ SQL Server 中支持全外连接 FULL JOIN +ON，但是暂时MySQL不支持，�
 
 ### 交叉连接
 SELECT 字段名1,字段名2 FROM 表a CROSS JOIN 表b
-CROSS JOIN 可以省略, 即
+
+CROSS JOIN 可以省略, 即:
 SELECT 字段名1,字段名2 FROM 表a, 表b
+
+如果是一张表就是自连接.
+  
 加上WHERE 就变成内连接了:
  SELECT 字段名1,字段名2 FROM 表a, 表b WHERE 表a.字段名=表b.字段名
 
@@ -257,6 +314,12 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
 * EXISTS 相关子查询.先执行主查询某个字段的值，根据子查询进行过滤.因为子查询涉及到了主查询的字段，所以叫相关子查询。EXISTS (子查询) 返回结果是：1或0.
   * 例如先筛选出 成绩表 里的所有列,然后按照 子查询筛选符合条件的: `SELECT * FROM 成绩表 WHERE EXISTS (SELECT 姓名 FROM 花名册 WHERE 成绩表.姓名=姓名 AND 源='倚天')`
 
+### 创建临时表  
+多用于复杂业务查询
+WITH 临时表名1 AS (SELECT * FROM 表 WHERE...条件),         
+临时表名2 AS (SELECT * FROM 临时表名1 WHERE...)      
+SELECT * FROM 临时表名1 LEFT JOIN 临时表名2 ........ 正式开始写  
+
 ## 增/删/改
 ### 创建 CREATE
 * CREATE DATABASE 数据库名字;
@@ -270,9 +333,10 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
 * 有以下数据类型:
   * 整形:
     * integer(size) 4 byte around 4 billion all positive
-    * int(size) 4 byte
-    * smallint(size)  2 byte
-    * tinyint(size)
+    * int(size) 4 byte: -2^31-2^31-1; (UNSIGNED 2^32)
+    * smallint(size)  2 byte  -2^15-2^15-1
+    * tinyint(size): 0 to 255
+    * size指显示的宽度,不影响实际的数据大小, 只对zerofill有用.
   * 浮点型: 
     * "size" 规定数字的最大位数。"d" 规定小数点右侧的最大位数。
     * decimal(size,d)
@@ -299,15 +363,12 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
   * AUTO_INCREMENT: MySQL 使用 AUTO_INCREMENT 关键字来执行 auto-increment 任务。默认地，AUTO_INCREMENT 的开始值是 1，每条新记录递增 1。
   
 * CREATE INDEX index_name ON table_name (column_name);在常常被搜索的列（以及表）上面创建索引。
-  * ALTER TABLE 创建之后修改表
-  * ALTER TABLE table_name
-  ADD column_name datatype; 增加列
-  * ALTER TABLE table_name 
-  DROP COLUMN column_name; 删除列.某些数据库系统不允许这种在数据库表中删除列的方式 (DROP COLUMN column_name)。
-  * ALTER TABLE table_name
-  ALTER COLUMN column_name datatype; 改变数据类型
-  * ALTER TABLE table_name
-  ADD/DROP 约束条件;
+* ALTER TABLE 创建之后修改表
+  * ADD COLUMN column_name datatype; 增加列
+    * 例如: `ADD COLUMN state TINYINT(2) NOT NULL DEFAULT '0' COMMENT '0为添加1为编辑' AFTER column_name`
+  * DROP COLUMN column_name; 删除列.
+  * MODIFY COLUMN column_name datatype; 改变数据类型
+  * ADD/DROP 约束条件;
   * ALTER TABLE Persons AUTO_INCREMENT=100; 要让 AUTO_INCREMENT 序列以其他的值起始
 
 ### 增加 INSERT INTO
@@ -342,6 +403,13 @@ HAVING 平均销量 > (SELECT AVG(销售数量) AS 平均销量 FROM 销售表 W
     set 师傅='唐僧'
     WHERE 徒弟='孙悟空';
     ```
+* 修改数据类型
+  CAST(value, datetype)
+  * DATE/DATETIME/TIME/DECIMAL/CHAR/SIGNED
+  * DECIMAL(m,n) m: 最大整数位数,默认18 n:小数位数,默认0
+  * 例如:`update 订单信息表 set call_time = cast(call_time as datetime); `     
+
+
 ### 删除 DELETE
 * 单表删除: `delete from 表名 where 筛选条件` 例如删除所有电话结尾为4的记录.`DELETE FROM 单表删除 WHERE 电话 LIKE '%4'`
 * 多表删除:
@@ -394,7 +462,7 @@ import pymysql
 # MYSQL
 import pymysql
 # 连接
-conn = pymysql.connect(host='localhost',user='root',password='o09',database='test')
+conn = pymysql.connect(host='localhost',user='root',password='1234',database='test')
 cursor = conn.cursor()
 
 # 查询版本号
